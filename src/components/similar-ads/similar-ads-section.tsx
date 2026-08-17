@@ -17,19 +17,27 @@ type SimilarAdsSectionProps = {
   };
 };
 
-export function SimilarAdsSection({ className, advertisements, labels }: SimilarAdsSectionProps) {
+export function SimilarAdsSection({
+  className,
+  advertisements,
+  labels,
+}: SimilarAdsSectionProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
-  function scroll(direction: "next" | "previous") {
+  function scroll(direction: "next" | "previous"): void {
     const list = listRef.current;
 
     if (!list) {
       return;
     }
 
-    const amount = list.clientWidth * 0.82;
-    const multiplier = direction === "next" ? 1 : -1;
-    list.scrollBy({ behavior: "smooth", left: amount * multiplier });
+    const scrollAmount = list.clientWidth * 0.82;
+    const directionMultiplier = direction === "next" ? 1 : -1;
+
+    list.scrollBy({
+      behavior: "smooth",
+      left: scrollAmount * directionMultiplier,
+    });
   }
 
   return (
@@ -37,19 +45,54 @@ export function SimilarAdsSection({ className, advertisements, labels }: Similar
       <div className="similarHeader">
         <div className="similarTitleGroup">
           <h2>{labels.title}</h2>
-          <span className="similarHeaderLightning"><BsLightningChargeFill size={22} /></span>
+
+          <span
+            aria-hidden="true"
+            className="similarHeaderLightning"
+          >
+            <BsLightningChargeFill size={22} />
+          </span>
         </div>
+
         <div className="similarControls">
-          <button aria-label={labels.previous} className="previousControl" onClick={() => scroll("previous")} type="button">
-            <Icon name="arrow" size={18} />
+          <button
+            type="button"
+            aria-label={labels.previous}
+            className="previousControl"
+            onClick={() => scroll("previous")}
+          >
+            <Icon
+              name="arrow"
+              size={18}
+              aria-hidden="true"
+            />
           </button>
-          <button aria-label={labels.next} className="nextControl" onClick={() => scroll("next")} type="button">
-            <Icon name="arrow" size={18} />
+
+          <button
+            type="button"
+            aria-label={labels.next}
+            className="nextControl"
+            onClick={() => scroll("next")}
+          >
+            <Icon
+              name="arrow"
+              size={18}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>
-      <div className="similarTrack" ref={listRef}>
-        {advertisements.map((advertisement) => <SimilarAdCard advertisement={advertisement} key={advertisement.id} />)}
+
+      <div
+        ref={listRef}
+        className="similarTrack"
+      >
+        {advertisements.map((advertisement) => (
+          <SimilarAdCard
+            key={advertisement.id}
+            advertisement={advertisement}
+          />
+        ))}
       </div>
     </section>
   );
