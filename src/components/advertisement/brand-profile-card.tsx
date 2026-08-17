@@ -24,7 +24,7 @@ export function BrandProfileCard({
   websiteUrl,
   logo,
   verified,
-
+  verifiedLabel,
   actionLabel,
   actionHelp,
   className,
@@ -35,32 +35,50 @@ export function BrandProfileCard({
         <div className="brandProfilePillHeader">
           {logo ? (
             <Image
-              alt={name}
-              className="brandLogo"
-              height={22}
-              width={22}
               src={logo}
+              alt={name}
+              width={22}
+              height={22}
+              className="brandLogo"
             />
           ) : (
-            <span aria-hidden="true" className="brandLogoFallback" />
+            <span
+              aria-hidden="true"
+              className="brandLogoFallback"
+            />
           )}
+
           <h2>{name}</h2>
-          {verified && <Icon name="check" size={12} />}
+
+          {verified && (
+            <span
+              aria-label={verifiedLabel}
+              title={verifiedLabel}
+            >
+              <Icon name="check" size={12} />
+            </span>
+          )}
         </div>
 
-        <p className="brandDescription">{description}</p>
+        <p className="brandDescription">
+          {description}
+        </p>
       </div>
 
       <div className="brandActionWrapper">
         <a
           className="brandActionButton"
           href={websiteUrl || "#"}
-          rel="noreferrer"
+          rel="noopener noreferrer"
           target="_blank"
         >
-          {actionLabel} <Icon name="arrow" size={14} />
+          <span>{actionLabel}</span>
+          <Icon name="arrow" size={14} />
         </a>
-        <p className="brandActionHelp">{actionHelp}</p>
+
+        <p className="brandActionHelp">
+          {actionHelp}
+        </p>
       </div>
     </aside>
   );
