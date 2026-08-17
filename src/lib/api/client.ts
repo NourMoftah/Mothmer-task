@@ -3,7 +3,10 @@ import { localizeApiData } from "@/lib/api/localize";
 
 import { getToken } from "@/lib/api/auth";
 
-const baseUrl = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "https://mock-api-plum.vercel.app";
+const baseUrl =
+  process.env.API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://mock-api-plum.vercel.app";
 
 if (!baseUrl) {
   throw new Error("Missing API_BASE_URL environment variable.");
@@ -41,7 +44,7 @@ export async function request<TData>(
   query?: QueryParameters,
 ): Promise<ApiResponse<TData>> {
   const token = getToken();
-  
+
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
   if (token) {
@@ -53,12 +56,28 @@ export async function request<TData>(
     headers,
   });
 
-  const payload = (await response.json()) as ApiResponse<TData> | ApiErrorResponse;
+  const payload = (await response.json()) as
+    | ApiResponse<TData>
+    | ApiErrorResponse;
 
   if (!response.ok || !payload.success) {
     const error = payload as ApiErrorResponse;
-    throw new ApiRequestError(error.message, response.status, error.error?.code, error.error?.details);
+    throw new ApiRequestError(
+      error.message,
+      response.status,
+      error.error?.code,
+      error.error?.details,
+    );
   }
 
-  return { ...payload, data: localizeApiData(payload.data, typeof query?.lang === "string" && (query.lang === "ar" || query.lang === "en") ? query.lang : undefined) };
+  return {
+    ...payload,
+    data: localizeApiData(
+      payload.data,
+      typeof query?.lang === "string" &&
+        (query.lang === "ar" || query.lang === "en")
+        ? query.lang
+        : undefined,
+    ),
+  };
 }

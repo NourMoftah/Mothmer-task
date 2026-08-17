@@ -33,7 +33,8 @@ export const mothmerApi = {
       }),
   },
 
-  config: (lang?: "ar" | "en") => request<SiteConfig>("/api/config", {}, { lang }),
+  config: (lang?: "ar" | "en") =>
+    request<SiteConfig>("/api/config", {}, { lang }),
 
   categories: (options?: ListOptions) =>
     request<Category[]>("/api/categories", {}, options),
@@ -51,8 +52,10 @@ export const mothmerApi = {
     request<InfluencerOffer[]>(`/api/ads/${id}/offers`, {}, options),
 
   likeAdvertisement: (id: string) => postEngagement(`/api/ads/${id}/like`),
-  favoriteAdvertisement: (id: string) => postEngagement(`/api/ads/${id}/favorite`),
-  recordAdvertisementView: (id: string) => postEngagement(`/api/ads/${id}/view`),
+  favoriteAdvertisement: (id: string) =>
+    postEngagement(`/api/ads/${id}/favorite`),
+  recordAdvertisementView: (id: string) =>
+    postEngagement(`/api/ads/${id}/view`),
 };
 
 function postEngagement(path: string): Promise<ApiResponse<unknown>> {
