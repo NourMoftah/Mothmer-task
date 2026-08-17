@@ -1,18 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { FiMoon, FiSun } from "react-icons/fi";
 
-import { FiSun, FiMoon } from "react-icons/fi";
 import { Icon } from "@/components/icons/icon";
-import type { Locale } from "@/i18n/config";
 import { useTheme } from "@/components/providers/theme-provider";
+import type { Locale } from "@/i18n/config";
 
 type SiteHeaderProps = {
   locale: Locale;
-  navigation: Array<{ label: string; href: string }>;
+  navigation: Array<{
+    label: string;
+    href: string;
+  }>;
   brandName: string;
   brandLogo?: string;
   joinLabel: string;
@@ -34,71 +37,201 @@ type SiteHeaderProps = {
   className: string;
 };
 
-function localizeHref(href: string, locale: Locale) {
-  if (!href.startsWith("/")) return href;
+function localizeHref(
+  href: string,
+  locale: Locale,
+): string {
+  if (!href.startsWith("/")) {
+    return href;
+  }
+
   return `/${locale}${href === "/" ? "" : href}`;
 }
 
-export function SiteHeader({ brandLogo, brandName, locale, navigation, joinHref, joinLabel, loginLabel, labels, className }: SiteHeaderProps) {
-  const alternateLocale = locale === "ar" ? "en" : "ar";
+export function SiteHeader({
+  brandLogo,
+  brandName,
+  locale,
+  navigation,
+  joinHref,
+  joinLabel,
+  loginLabel,
+  labels,
+  className,
+}: SiteHeaderProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { theme, setTheme } = useTheme();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navigationItems = navigation.slice(0, 3).map((item) => ({ ...item, href: localizeHref(item.href, locale) }));
-  const query = searchParams.toString();
-  const languageHref = `${pathname.replace(/^\/(ar|en)(?=\/|$)/, `/${alternateLocale}`)}${query ? `?${query}` : ""}`;
+  const alternateLocale =
+    locale === "ar" ? "en" : "ar";
+
+  const navigationItems = navigation
+    .slice(0, 3)
+    .map((item) => ({
+      ...item,
+      href: localizeHref(item.href, locale),
+    }));
+
+  const queryString = searchParams.toString();
+
+  const alternatePathname = pathname.replace(
+    /^\/(ar|en)(?=\/|$)/,
+    `/${alternateLocale}`,
+  );
+
+  const languageHref = `${alternatePathname}${
+    queryString ? `?${queryString}` : ""
+  }`;
+
   const isDark = theme === "dark";
+
+  function toggleTheme(): void {
+    setTheme(isDark ? "light" : "dark");
+  }
+
+  function toggleMenu(): void {
+    setIsMenuOpen((isOpen) => !isOpen);
+  }
+
+  function closeMenu(): void {
+    setIsMenuOpen(false);
+  }
 
   return (
     <header className={className}>
       <div className="headerInner">
-        <Link aria-label={labels.brandAriaLabel} className="brand" href={`/${locale}`}>
-          {brandLogo ? <Image alt="" className="brandMark" height={34} src={brandLogo} width={34} /> : <span className="brandMark">{labels.brandMark}</span>}
-          <span className="brandName">{brandName}</span>
+        <Link
+          href={`/${locale}`}
+          aria-label={labels.brandAriaLabel}
+          className="brand"
+        >
+          {brandLogo ? (
+            <Image
+              src={brandLogo}
+              alt=""
+              width={34}
+              height={34}
+              className="brandMark"
+            />
+          ) : (
+            <span
+              className="brandMark"
+              aria-hidden="true"
+            >
+              {labels.brandMark}
+            </span>
+          )}
+
+          <span className="brandName">
+            {brandName}
+          </span>
         </Link>
 
-        <nav aria-label={labels.primaryNavigation} className="navLinks">
+        <nav
+          aria-label={labels.primaryNavigation}
+          className="navLinks"
+        >
           {navigationItems.map((item) => (
-            <Link href={item.href} key={item.label}>
+            <Link
+              key={item.label}
+              href={item.href}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
         <div className="headerActions">
-          <button aria-label={isDark ? labels.switchToLight : labels.switchToDark} className="themeButton" onClick={() => setTheme(isDark ? "light" : "dark")} type="button">
-            {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
+          <button
+            type="button"
+            className="themeButton"
+            aria-label={
+              isDark
+                ? labels.switchToLight
+                : labels.switchToDark
+            }
+            onClick={toggleTheme}
+          >
+            {isDark ? (
+              <FiSun
+                size={18}
+                aria-hidden="true"
+              />
+            ) : (
+              <FiMoon
+                size={18}
+                aria-hidden="true"
+              />
+            )}
           </button>
-          <Link aria-label={labels.switchLanguage} className="languageLink" href={languageHref}>
+
+          <Link
+            href={languageHref}
+            className="languageLink"
+            aria-label={labels.switchLanguage}
+          >
             <span>{labels.languageShort}</span>
-            <span className="languageLabel">{labels.languageLabel}</span>
+            <span className="languageLabel">
+              {labels.languageLabel}
+            </span>
           </Link>
-          <Link className="loginLink" href={`/${locale}/login`}>{loginLabel}</Link>
-          <Link className="joinButton" href={localizeHref(joinHref, locale)}>
-            <Icon name="user" size={17} />
+
+          <Link
+            href={`/${locale}/login`}
+            className="loginLink"
+          >
+            {loginLabel}
+          </Link>
+
+          <Link
+            href={localizeHref(joinHref, locale)}
+            className="joinButton"
+          >
+            <Icon
+              name="user"
+              size={17}
+              aria-hidden="true"
+            />
             {joinLabel}
           </Link>
+
           <button
+            type="button"
+            className="menuButton"
+            id="mobile-menu-button"
             aria-controls="mobile-navigation"
             aria-expanded={isMenuOpen}
-            aria-label={isMenuOpen ? labels.closeNavigation : labels.openNavigation}
-            className="menuButton"
-            onClick={() => setIsMenuOpen((open) => !open)}
-            type="button"
+            aria-label={
+              isMenuOpen
+                ? labels.closeNavigation
+                : labels.openNavigation
+            }
+            onClick={toggleMenu}
           >
-            <Icon name="menu" />
+            <Icon
+              name="menu"
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>
+
       <nav
-        aria-label={labels.primaryNavigation}
-        className={`mobileNav${isMenuOpen ? " mobileNavOpen" : ""}`}
         id="mobile-navigation"
+        className={`mobileNav${
+          isMenuOpen ? " mobileNavOpen" : ""
+        }`}
+        aria-label={labels.primaryNavigation}
       >
         {navigationItems.map((item) => (
-          <Link href={item.href} key={item.label} onClick={() => setIsMenuOpen(false)}>
+          <Link
+            key={item.label}
+            href={item.href}
+            onClick={closeMenu}
+          >
             {item.label}
           </Link>
         ))}
