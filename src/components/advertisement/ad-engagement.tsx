@@ -24,7 +24,14 @@ type AdEngagementProps = {
   className: string;
 };
 
-export function AdEngagement({ likes, adId, initialLiked, initialFavorite, labels, className }: AdEngagementProps) {
+export function AdEngagement({
+  likes,
+  adId,
+  initialLiked,
+  initialFavorite,
+  labels,
+  className,
+}: AdEngagementProps) {
   const [liked, setLiked] = useState(initialLiked);
   const [favorite, setFavorite] = useState(initialFavorite);
   const [pending, startTransition] = useTransition();
@@ -43,8 +50,7 @@ export function AdEngagement({ likes, adId, initialLiked, initialFavorite, label
 
     try {
       await fetch(`/api/ads/${adId}/${action}`, { method: "POST" });
-    } catch {
-    }
+    } catch {}
   }
 
   async function share() {
@@ -67,7 +73,9 @@ export function AdEngagement({ likes, adId, initialLiked, initialFavorite, label
         onClick={() => void mutate("like")}
         type="button"
       >
-        <span className={`statBadgeIcon ${liked ? "orangeBadge" : "grayBadge"}`}>
+        <span
+          className={`statBadgeIcon ${liked ? "orangeBadge" : "grayBadge"}`}
+        >
           <FaThumbsUp size={12} />
         </span>
         <span className="statBadgeValue">{likes || "942,516"}</span>
@@ -77,7 +85,7 @@ export function AdEngagement({ likes, adId, initialLiked, initialFavorite, label
         aria-label={favorite ? labels.unfavorite : labels.save}
         aria-pressed={favorite}
         className="statBadgeButton statFavoriteButton"
-        disabled={pending === "favorite"}
+        disabled={pending}
         onClick={() => void mutate("favorite")}
         type="button"
       >
@@ -87,14 +95,23 @@ export function AdEngagement({ likes, adId, initialLiked, initialFavorite, label
         <span className="statBadgeValue">280,541,731</span>
       </button>
 
-      <button aria-label={labels.share} className="shareActionButton" onClick={() => void share()} type="button">
+      <button
+        aria-label={labels.share}
+        className="shareActionButton"
+        onClick={() => void share()}
+        type="button"
+      >
         <span className="shareActionIcon">
           <FiShare2 size={13} />
         </span>
         <span>{labels.share}</span>
       </button>
 
-      {message && <span aria-live="polite" className="interactionMessage">{message}</span>}
+      {message && (
+        <span aria-live="polite" className="interactionMessage">
+          {message}
+        </span>
+      )}
     </div>
   );
 }
