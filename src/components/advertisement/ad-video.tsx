@@ -45,7 +45,6 @@ export function AdVideo({
   sponsoredLabel,
   videoLabel,
   playLabel,
-  duration,
   brandTitle,
   className,
 }: AdVideoProps) {
