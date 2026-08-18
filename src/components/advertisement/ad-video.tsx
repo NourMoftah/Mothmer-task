@@ -56,8 +56,26 @@ export function AdVideo({
   const [currentTime, setCurrentTime] = useState(0);
   const [mediaDuration, setMediaDuration] = useState(0);
   const [hasError, setHasError] = useState(false);
+  const [apiVideoUrl, setApiVideoUrl] = useState<string>("");
+  const [apiPoster, setApiPoster] = useState<string>("");
 
-  const activeVideoUrl = videoUrl || FALLBACK_VIDEO_URL;
+  useEffect(() => {
+    // Fetch video data from GET /api/ads/ad_001 as requested
+    fetch("https://mock-api-plum.vercel.app/api/ads/ad_001")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.data?.videoUrl) {
+          setApiVideoUrl(json.data.videoUrl);
+        }
+        if (json.data?.poster) {
+          setApiPoster(json.data.poster);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch ad_001 video:", err));
+  }, []);
+
+  const activeVideoUrl = apiVideoUrl || videoUrl || FALLBACK_VIDEO_URL;
+  const activePoster = apiPoster || poster;
 
   const totalDuration = mediaDuration || FALLBACK_DURATION;
 
@@ -134,7 +152,7 @@ export function AdVideo({
               className={`videoElement ${playing ? "isPlaying" : ""}`}
               muted={muted}
               playsInline
-              poster={poster || undefined}
+              poster={activePoster || undefined}
               preload="auto"
               onClick={() => void togglePlayback()}
               onDurationChange={(event) => {
@@ -157,9 +175,9 @@ export function AdVideo({
             >
               <source src={activeVideoUrl} type="video/mp4" />
             </video>
-          ) : poster ? (
+          ) : activePoster ? (
             <Image
-              src={poster}
+              src={activePoster}
               alt=""
               fill
               priority
