@@ -38,6 +38,8 @@ function createUrl(path: string, query?: QueryParameters) {
   return url;
 }
 
+const REQUEST_TIMEOUT_MS = 25_000;
+
 export async function request<TData>(
   path: string,
   options: RequestInit = {},
@@ -51,10 +53,21 @@ export async function request<TData>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(createUrl(path, query), {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(createUrl(path, query), {
+      ...options,
+      headers,
+      signal: controller.signal,
+      // Cache GET requests for 1 hour to avoid repeated slow calls on Vercel
+      next: options.method && options.method !== "GET" ? undefined : { revalidate: 3600 },
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   const payload = (await response.json()) as
     | ApiResponse<TData>
