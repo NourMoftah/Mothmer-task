@@ -57,7 +57,16 @@ export async function AdvertisementPage({
   const brandResult = ad
     ? await safely(mothmerApi.brand(ad.brandId, language))
     : { data: undefined };
-  const brand = brandResult.data?.data;
+  // Fall back to the brand summary embedded in the ad if the brand API fails
+  const brand = brandResult.data?.data ?? (ad?.brand ? {
+    ...ad.brand,
+    cover: ad.poster || ad.thumbnail,
+    categoryId: ad.categoryId,
+    adsCount: 0,
+    followers: 0,
+    rating: 0,
+    joinedAt: ad.publishedAt,
+  } : undefined);
   const navigation =
     config?.nav.map((item) => ({ href: item.href, label: item.label })) ??
     copy.navigation.map((label, index) => ({
