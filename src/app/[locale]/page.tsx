@@ -2,6 +2,9 @@ import { isLocale } from "@/i18n/config";
 
 import { AdvertisementPage } from "./advertisement-page";
 
+// Cache page for 1 hour — slow API is only called once per hour, not on every visit
+export const revalidate = 3600;
+
 const DEFAULT_ADVERTISEMENT_ID = "ad_001";
 
 export default async function HomePage({
